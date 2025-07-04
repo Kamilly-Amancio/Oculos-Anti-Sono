@@ -1,0 +1,43 @@
+//Projeto Oculos Anti Sono
+//Disciplina: Programação de Microcontroladores
+//Participantes: Kamilly Amancio Batista - 202200570397
+//				 Victor Lucas da Rocha Maia - 202202579981
+
+byte led = 9, pir = 12, buzzer = 6; 
+unsigned long tempoParado = 0; // Variável para armazenar o tempo em que o objeto está parado
+bool movimentoAnterior = false; // Variável para armazenar o estado anterior do movimento
+
+void setup()
+{
+  pinMode(led, OUTPUT);
+  pinMode(pir, INPUT); // Corrigido de led para pir
+  pinMode(buzzer, OUTPUT);
+}
+
+void loop()
+{
+  byte movimento = digitalRead(pir);
+  
+  if (movimento==1) {
+    // Quando há movimento, reseta a variável de tempo parado e estado anterior
+    tempoParado = 0;
+    movimentoAnterior = true;
+    tone(buzzer, 261, 250);
+    delay(250);
+    noTone(buzzer);
+    digitalWrite(led, HIGH);
+    delay(500);
+  } else {
+    // Quando não há movimento
+    digitalWrite(led, LOW);
+    
+    if (movimentoAnterior) {
+      // Se antes havia movimento, comece a contar o tempo parado
+      movimentoAnterior = false;
+      tempoParado = millis();
+    } else if (tempoParado > 0 && (millis() - tempoParado >= 3000)) {
+      // Se já está parado por pelo menos 3 segundos, acione o alarme
+      tone(buzzer, 261);
+    }
+  }
+}
